@@ -1,4 +1,5 @@
-﻿open System
+﻿// http://cocoamine.net/blog/2015/03/20/replacing-photoshop-with-nsstring/
+open System
 open System.Drawing
 open System.Windows.Forms
 
@@ -42,6 +43,35 @@ let drawChevron (bounds : Rectangle) =
     let pen = new Pen(Color.Gray, lineWidth)
     gr.DrawLines(pen, [| top; middle; bottom |])
     chevron
+
+let asciiRep = [|
+    " . . . . . . . . . . ."
+    " . . 1 2 . . . . . . ."
+    " . . A # # . . . . . ."
+    " . . . # # # . . . . ."
+    " . . . . # # # . . . ."
+    " . . . . . 9 # 3 . . ."
+    " . . . . . 8 # 4 . . ."
+    " . . . . # # # . . . ."
+    " . . . # # # . . . . ."
+    " . . 7 # # . . . . . ."
+    " . . 6 5 . . . . . . ."
+    " . . . . . . . . . . ." |]
+
+let dotSymbols =
+    seq {
+        yield '0'
+        yield! [|'1'..'9'|]
+        yield! [|'A'..'Z'|]
+        yield! [|'a'..'z'|]
+    } |> Array.ofSeq
+
+type Dot = int * int
+type AsciiImage =
+    | Shape of Dot list
+    | Line of Dot * Dot
+    | Pixel of Dot
+    | Ellipse of Dot * Dot * Dot * Dot
 
 boxImage.Image <- drawChevron boxImage.Bounds
 [<STAThread>]
