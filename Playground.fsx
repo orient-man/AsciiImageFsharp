@@ -58,16 +58,34 @@ let asciiRep = [|
     " . . 6 5 . . . . . . ."
     " . . . . . . . . . . ." |]
 
-let dotSymbols =
-    seq {
+let dotSymbols = 
+    seq { 
         yield '0'
-        yield! [|'1'..'9'|]
-        yield! [|'A'..'Z'|]
-        yield! [|'a'..'z'|]
-    } |> Array.ofSeq
+        yield! [| '1'..'9' |]
+        yield! [| 'A'..'Z' |]
+        yield! [| 'a'..'z' |]
+    }
+    |> Array.ofSeq
+
+let getDots (arr : string []) = 
+    seq { 
+        for y in 0..arr.Length - 1 do
+            let row = arr.[y].Replace(" ", "")
+            for x in 0..row.Length - 1 do
+                let elem = row.[x]
+                match dotSymbols |> Array.tryFindIndex (elem |> (=)) with
+                | Some idx -> yield (x, y, elem, idx)
+                | _ -> ()
+    }
+
+let dotsSorted = 
+    getDots asciiRep
+    |> Seq.sortBy (fun (_, _, _, idx) -> idx)
+    |> Array.ofSeq
 
 type Dot = int * int
-type AsciiImage =
+
+type AsciiImage = 
     | Shape of Dot list
     | Line of Dot * Dot
     | Pixel of Dot
