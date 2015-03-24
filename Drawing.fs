@@ -38,11 +38,7 @@ let draw (scale : int) (rep : string []) =
 
         match shape with
         | Free(points) -> 
-            let scaledPoints = 
-                points
-                |> List.map scalePoint
-                |> List.map toPointF
-                |> Array.ofList
+            let scaledPoints = points |> List.map (scalePoint >> toPointF) |> Array.ofList
             gr.DrawPolygon(pen, scaledPoints)
             gr.FillPolygon(brush, scaledPoints)
         | Line(p1, p2) -> 
