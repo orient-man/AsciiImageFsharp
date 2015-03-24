@@ -48,10 +48,33 @@ let drawChevron (bounds : Rectangle) =
     gr.DrawLines(pen, [| top; middle; bottom |])
     chevron
 
+let draw (bounds : Rectangle) (shapes : Shape list) = 
+    let margin = 10
+    let scale = 20.0f
+    let lineWidth = scale * 1.0f
+
+    let bitmap = new Bitmap(bounds.Width - margin, bounds.Height - margin)
+    use gr = Graphics.FromImage(bitmap)
+    gr.Clear(Color.White)
+    let pen = new Pen(Color.Black, lineWidth)
+    let brush = new SolidBrush(Color.Black);
+
+    let drawShape (shape : Shape) =
+        let toPointF (x, y) = new PointF(scale * float32(x), scale * float32(y))
+        match shape with
+        | Free(points) -> gr.FillPolygon(brush, points |> List.map toPointF |> Array.ofList)
+        | Line(p1, p2) -> gr.DrawLine(pen, toPointF p1, toPointF p2)
+        | Pixel(p) -> ()
+        | Ellipse(p1, p2, p3, p4) -> ()
+
+    shapes |> List.iter drawShape
+    bitmap
+
 //let dotsSorted = getOrderedDots chevron
 //parse chevron
 //parse imageWith3Shapes
 
-boxImage.Image <- drawChevron boxImage.Bounds
+boxImage.Image <- draw boxImage.Bounds (Shapes.``6 lines & free shape`` |> parse)
+
 [<STAThread>]
 do mainForm.Show()
