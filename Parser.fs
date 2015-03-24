@@ -2,7 +2,7 @@
 
 type Dot = int * int
 type Shape = 
-    | Free of Dot list
+    | Polygon of Dot list
     | Line of Dot * Dot
     | Pixel of Dot
     | Ellipse of Dot * Dot * Dot * Dot
@@ -32,7 +32,7 @@ let rec private parseDots acc dots =
     let handleOrdered = function
         | [] -> []
         | single::[] -> [Pixel(single)]
-        | many -> [Free(many |> List.rev)]
+        | many -> [Polygon(many |> List.rev)]
     seq {
         match dots with
         | (d1, i1)::(d2, i2)::tail when i2 = i1 + 1 ->

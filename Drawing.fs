@@ -16,7 +16,7 @@ let drawShape (gr : Graphics) (scale : int) shape =
     let toPointF (x, y) = new PointF(x, y)
 
     match shape with
-    | Free(points) -> 
+    | Polygon(points) -> 
         let scaled = points |> List.map (scalePoint >> toPointF) |> Array.ofList
         gr.DrawPolygon(pen, scaled)
         gr.FillPolygon(brush, scaled)
