@@ -3,14 +3,46 @@
 open System.Drawing
 open Parser
 
-let draw (scale : int) (rep : string []) = 
+let drawShape (gr : Graphics) (scale : int) shape = 
     let scaleF = float32 (scale)
-    let width = rep.[0].Length / 2 + 1
-    let scaledWidth = scale * width
-    let height = rep.Length
-    let scaledHeight = scale * height
-    let bitmap = new Bitmap(scaledWidth, scaledHeight)
+    let pen = new Pen(Color.Black, scaleF)
+    let brush = new SolidBrush(Color.Black)
+    
+    let drawPixel (x, y) = gr.FillRectangle(brush, scale * x, scale * y, scale, scale)
+    
+    let scalePoint (x, y) = 
+        (scaleF * (0.5f + float32 (x)), scaleF * (0.5f + float32 (y)))
 
+    let toPointF (x, y) = new PointF(x, y)
+
+    match shape with
+    | Free(points) -> 
+        let scaled = points |> List.map (scalePoint >> toPointF) |> Array.ofList
+        gr.DrawPolygon(pen, scaled)
+        gr.FillPolygon(brush, scaled)
+    | Line(p1, p2) -> 
+        drawPixel p1
+        drawPixel p2
+        gr.DrawLine(pen, p1 |> scalePoint |> toPointF, p2 |> scalePoint |> toPointF)
+    | Pixel(p) -> drawPixel p
+    | Ellipse(p1, p2, p3, p4) -> 
+        let points = [ p1; p2; p3; p4 ]
+        let minX = points |> List.map fst |> List.min
+        let maxX = points |> List.map fst |> List.max
+        let minY = points |> List.map snd |> List.min
+        let maxY = points |> List.map snd |> List.max
+        let x, y = (minX, minY) |> scalePoint
+        let width, height = (maxX - minX, maxY - minY) |> scalePoint
+        gr.DrawEllipse(pen, x, y, width, height)
+        gr.FillEllipse(brush, x, y, width, height)
+
+let draw (scale : int) (rep : string []) = 
+    let width = rep.[0].Length / 2 + 1
+    let height = rep.Length
+    let scaledWidth = scale * width
+    let scaledHeight = scale * height
+
+    let bitmap = new Bitmap(scaledWidth, scaledHeight)
     use gr = Graphics.FromImage(bitmap)
     gr.SmoothingMode <- Drawing2D.SmoothingMode.AntiAlias
     gr.Clear(Color.White)
@@ -23,41 +55,8 @@ let draw (scale : int) (rep : string []) =
             gr.DrawLine(grayPen, new Point(scale * i, 0), new Point(scale * i, scaledHeight))
         gr.DrawRectangle(grayPen, 0, 0, scaledWidth - 1, scaledHeight - 1)
     
-    let drawShape shape = 
-        let pen = new Pen(Color.Black, scaleF)
-        let brush = new SolidBrush(Color.Black)
-        
-        let drawPixel (x, y) = gr.FillRectangle(brush, scale * x, scale * y, scale, scale)
-        
-        let scalePoint (x, y) = 
-            (scaleF * (0.5f + float32 (x)), scaleF * (0.5f + float32 (y)))
-
-        let toPointF (x, y) = new PointF(x, y)
-
-        match shape with
-        | Free(points) -> 
-            let scaled = points |> List.map (scalePoint >> toPointF) |> Array.ofList
-            gr.DrawPolygon(pen, scaled)
-            gr.FillPolygon(brush, scaled)
-        | Line(p1, p2) -> 
-            drawPixel p1
-            drawPixel p2
-            gr.DrawLine(pen, p1 |> scalePoint |> toPointF, p2 |> scalePoint |> toPointF)
-        | Pixel(p) -> drawPixel p
-        | Ellipse(p1, p2, p3, p4) -> 
-            let points = [ p1; p2; p3; p4 ]
-            let minX = points |> List.map fst |> List.min
-            let maxX = points |> List.map fst |> List.max
-            let minY = points |> List.map snd |> List.min
-            let maxY = points |> List.map snd |> List.max
-            let x, y = (minX, minY) |> scalePoint
-            let width, height = (maxX - minX, maxY - minY) |> scalePoint
-            gr.DrawEllipse(pen, x, y, width, height)
-            gr.FillEllipse(brush, x, y, width, height)
-    
     if scale > 1 then drawGrid()
-    rep
-    |> parse
-    |> List.iter drawShape
+    rep |> parse |> List.iter (drawShape gr scale)
+
     bitmap
 
