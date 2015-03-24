@@ -27,9 +27,7 @@ let draw (scale : int) (rep : string []) =
         let pen = new Pen(Color.Black, scaleF)
         let brush = new SolidBrush(Color.Black)
         
-        let drawPixel p = 
-            let x, y = p
-            gr.FillRectangle(brush, scale * x, scale * y, scale, scale)
+        let drawPixel (x, y) = gr.FillRectangle(brush, scale * x, scale * y, scale, scale)
         
         let scalePoint (x, y) = 
             (scaleF * (0.5f + float32 (x)), scaleF * (0.5f + float32 (y)))
@@ -38,9 +36,9 @@ let draw (scale : int) (rep : string []) =
 
         match shape with
         | Free(points) -> 
-            let scaledPoints = points |> List.map (scalePoint >> toPointF) |> Array.ofList
-            gr.DrawPolygon(pen, scaledPoints)
-            gr.FillPolygon(brush, scaledPoints)
+            let scaled = points |> List.map (scalePoint >> toPointF) |> Array.ofList
+            gr.DrawPolygon(pen, scaled)
+            gr.FillPolygon(brush, scaled)
         | Line(p1, p2) -> 
             drawPixel p1
             drawPixel p2
