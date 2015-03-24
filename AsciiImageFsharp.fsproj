@@ -57,6 +57,7 @@
     <Compile Include="Parser.fs" />
     <Compile Include="Shapes.fs" />
     <Compile Include="ParserTests.fs" />
+    <Compile Include="Drawing.fs" />
     <None Include="Playground.fsx" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
@@ -77,6 +78,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="Unquote">
       <HintPath>packages\Unquote.2.2.2\lib\net40\Unquote.dll</HintPath>
