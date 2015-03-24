@@ -44,19 +44,33 @@ let drawChevron (bounds : Rectangle) =
     gr.DrawLines(pen, [| top; middle; bottom |])
     chevron
 
-let asciiRep = [|
-    " . . . . . . . . . . ."
-    " . . 1 2 . . . . . . ."
-    " . . A # # . . . . . ."
-    " . . . # # # . . . . ."
-    " . . . . # # # . . . ."
-    " . . . . . 9 # 3 . . ."
-    " . . . . . 8 # 4 . . ."
-    " . . . . # # # . . . ."
-    " . . . # # # . . . . ."
-    " . . 7 # # . . . . . ."
-    " . . 6 5 . . . . . . ."
-    " . . . . . . . . . . ." |]
+let chevron = [|
+    ". . . . . . . . . . ."
+    ". . 1 2 . . . . . . ."
+    ". . A # # . . . . . ."
+    ". . . # # # . . . . ."
+    ". . . . # # # . . . ."
+    ". . . . . 9 # 3 . . ."
+    ". . . . . 8 # 4 . . ."
+    ". . . . # # # . . . ."
+    ". . . # # # . . . . ."
+    ". . 7 # # . . . . . ."
+    ". . 6 5 . . . . . . ."
+    ". . . . . . . . . . ." |]
+
+let imageWith3Shapes = [|
+    ". . . . . . . C . . E"
+    ". . . 1 2 . . . . . ."
+    ". . . A . . . . . . ."
+    ". . . . . . . . . . D"
+    "G . H . . . . . . . ."
+    ". . . . . . 9 . 3 . ."
+    ". . I J . . 8 . 4 . ."
+    "L . . K . . . . . . ."
+    ". . . . . . . . . . ."
+    ". . . 7 . . . . . . ."
+    ". . . 6 5 . . . . . ."
+    ". . . . . . . . . . ." |]
 
 let dotSymbols = 
     seq { 
@@ -67,29 +81,56 @@ let dotSymbols =
     }
     |> Array.ofSeq
 
-let getDots (arr : string []) = 
+let indexOfSymbol (_, idx) = idx
+
+let getOrderedDots (arr : string []) = 
     seq { 
         for y in 0..arr.Length - 1 do
             let row = arr.[y].Replace(" ", "")
             for x in 0..row.Length - 1 do
                 let elem = row.[x]
                 match dotSymbols |> Array.tryFindIndex (elem |> (=)) with
-                | Some idx -> yield (x, y, elem, idx)
+                | Some idx -> yield ((x, y), idx)
                 | _ -> ()
-    }
+    } |> Seq.sortBy indexOfSymbol |> List.ofSeq
 
-let dotsSorted = 
-    getDots asciiRep
-    |> Seq.sortBy (fun (_, _, _, idx) -> idx)
-    |> Array.ofSeq
+let dotsSorted = getOrderedDots chevron
 
 type Dot = int * int
-
-type AsciiImage = 
+type Figure = 
     | Shape of Dot list
     | Line of Dot * Dot
     | Pixel of Dot
     | Ellipse of Dot * Dot * Dot * Dot
+
+let rec parseDots acc dots =
+    let handleOrdered = function
+        | [] -> []
+        | single::[] -> [Pixel(single)]
+        | many -> [Shape(many |> List.rev)]
+    seq {
+        match dots with
+        | (d1, i1)::(d2, i2)::tail when i2 = i1 + 1 ->
+            yield! parseDots (d1::acc) ((d2, i2)::tail)
+        | (d1, i1)::(d2, i2)::(d3, i3)::(d4, i4)::tail when i1 = i2 && i2 = i3 && i3 = i4 ->
+            yield! handleOrdered acc
+            yield Ellipse(d1, d2, d3, d4)
+            yield! parseDots [] tail
+        | (d1, i1)::(d2, i2)::tail when i1 = i2 ->
+            yield! handleOrdered acc
+            yield Line(d1, d2)
+            yield! parseDots [] tail
+        | (d, _)::tail ->
+            yield! handleOrdered (d::acc)
+            yield! parseDots [] tail
+        | _ -> yield! handleOrdered acc
+    }
+
+let parse rep =
+    rep |> getOrderedDots |> parseDots [] |> List.ofSeq
+
+parse chevron
+parse imageWith3Shapes
 
 boxImage.Image <- drawChevron boxImage.Bounds
 [<STAThread>]
