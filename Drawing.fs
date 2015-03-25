@@ -3,10 +3,10 @@
 open System.Drawing
 open Parser
 
-let drawShape (gr : Graphics) (scale : int) shape = 
+let drawShape (gr : Graphics) (scale : int) (color : Color) shape = 
     let scaleF = float32 (scale)
-    let pen = new Pen(Color.Black, scaleF)
-    let brush = new SolidBrush(Color.Black)
+    let pen = new Pen(color, scaleF)
+    let brush = new SolidBrush(color)
     
     let drawPixel (x, y) = gr.FillRectangle(brush, scale * x, scale * y, scale, scale)
     
@@ -36,6 +36,10 @@ let drawShape (gr : Graphics) (scale : int) shape =
         gr.DrawEllipse(pen, x, y, width, height)
         gr.FillEllipse(brush, x, y, width, height)
 
+let drawFilledShape drawShape = function
+    | Solid(s) -> drawShape Color.Black s
+    | Transparent(s) -> drawShape Color.Transparent s
+
 let draw (scale : int) (rep : string []) = 
     let width = rep.[0].Length / 2 + 1
     let height = rep.Length
@@ -56,7 +60,7 @@ let draw (scale : int) (rep : string []) =
         gr.DrawRectangle(grayPen, 0, 0, scaledWidth - 1, scaledHeight - 1)
     
     if scale > 1 then drawGrid()
-    rep |> parse |> List.iter (drawShape gr scale)
+    rep |> parse |> List.iter (drawFilledShape (drawShape gr scale))
 
     bitmap
 

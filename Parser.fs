@@ -6,7 +6,7 @@ type Shape =
     | Line of Dot * Dot
     | Pixel of Dot
     | Ellipse of Dot * Dot * Dot * Dot
-
+type FilledShape = Solid of Shape | Transparent of Shape
 let private symbolsOrdered = 
     seq { 
         yield '0'
@@ -31,8 +31,8 @@ let getOrderedDots (arr : string []) =
 let rec private parseDots acc dots =
     let handleOrdered = function
         | [] -> []
-        | single::[] -> [Pixel(single)]
-        | many -> [Polygon(many |> List.rev)]
+        | single::[] -> [Solid(Pixel(single))]
+        | many -> [Solid(Polygon(many |> List.rev))]
     seq {
         match dots with
         | (d1, i1)::(d2, i2)::tail when i2 = i1 + 1 ->
@@ -40,11 +40,11 @@ let rec private parseDots acc dots =
         | (d1, i1)::(d2, i2)::(d3, i3)::(d4, i4)::tail
             when i1 = i2 && i2 = i3 && i3 = i4 ->
             yield! handleOrdered acc
-            yield Ellipse(d1, d2, d3, d4)
+            yield Solid(Ellipse(d1, d2, d3, d4))
             yield! parseDots [] tail
         | (d1, i1)::(d2, i2)::tail when i1 = i2 ->
             yield! handleOrdered acc
-            yield Line(d1, d2)
+            yield Solid(Line(d1, d2))
             yield! parseDots [] tail
         | (d, _)::tail ->
             yield! handleOrdered (d::acc)
