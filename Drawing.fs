@@ -59,8 +59,8 @@ let draw (scale : int) (rep : string []) =
             gr.DrawLine(grayPen, new Point(scale * i, 0), new Point(scale * i, scaledHeight))
         gr.DrawRectangle(grayPen, 0, 0, scaledWidth - 1, scaledHeight - 1)
     
-    if scale > 1 then drawGrid()
     rep |> parse |> List.iter (drawFilledShape (drawShape gr scale))
 
+    if scale > 1 then drawGrid()
     bitmap
 
