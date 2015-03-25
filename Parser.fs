@@ -1,7 +1,7 @@
 ﻿module Parser
 
 type Dot = int * int
-type Shape = 
+type Shape =
     | Polygon of Dot list
     | Line of Dot * Dot
     | Pixel of Dot
