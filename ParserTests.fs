@@ -98,3 +98,13 @@ let ``ellipse + 2 pixels``() =
           Solid(Pixel(1, 1))
           Solid(Pixel(9, 1)) ]
     test <@ expected = actual @>
+
+[<Test>]
+let deletion() = 
+    let actual = Shapes.deletion |> parse
+    
+    let expected = 
+        [ Solid(Ellipse((5, 0), (0, 5), (10, 5), (5, 10)))
+          Transparent(Line((3, 3), (7, 7)))
+          Transparent(Line((7, 3), (3, 7))) ]
+    test <@ expected = actual @>
