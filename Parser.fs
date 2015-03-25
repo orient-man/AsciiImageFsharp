@@ -12,7 +12,6 @@ let getOrderedDots (arr : string []) =
     let tryFindIndex arr symbol = arr |> Array.tryFindIndex (symbol |> (=))
     let (|Solid|_|) symbol = tryFindIndex  [| 'A'..'Z' |] symbol
     let (|Transparent|_|) symbol = tryFindIndex [| 'a'..'z' |] symbol
-    let indexOfSymbol (_, idx) = idx
 
     seq { 
         for y in 0..arr.Length - 1 do
@@ -22,7 +21,7 @@ let getOrderedDots (arr : string []) =
                 | Solid idx  -> yield (((x, y), Solid), idx)
                 | Transparent idx -> yield (((x, y), Transparent), idx)
                 | _ -> ()
-    } |> Seq.sortBy indexOfSymbol |> List.ofSeq
+    } |> Seq.sortBy snd |> List.ofSeq
 
 let rec private parseDots acc dots =
     let handleOrdered points =
