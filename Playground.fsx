@@ -15,7 +15,7 @@ let boxImage =
 
 mainForm.Controls.Add(boxImage)
 
-let image = Shapes.deletion |> draw 30
+let image = Shapes.``DevTalk.pl`` |> draw 30
 //let image = Shapes.``chevron + 2 shapes`` |> draw 30
 //let image = Shapes.``8 lines`` |> draw 30
 //let image = Shapes.``ellipse + 2 pixels`` |> draw 30
