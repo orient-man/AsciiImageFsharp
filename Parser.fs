@@ -10,8 +10,8 @@ type FilledShape = Solid of Shape | Transparent of Shape
 
 let getOrderedDots (arr : string []) = 
     let tryFindIndex arr symbol = arr |> Array.tryFindIndex (symbol |> (=))
-    let (|Solid|_|) symbol = tryFindIndex  [| 'A'..'Z' |] symbol
-    let (|Transparent|_|) symbol = tryFindIndex [| 'a'..'z' |] symbol
+    let (|Solid|_|) = tryFindIndex [| 'A'..'Z' |]
+    let (|Transparent|_|) = tryFindIndex [| 'a'..'z' |]
 
     seq { 
         for y in 0..arr.Length - 1 do
