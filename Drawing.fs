@@ -32,9 +32,9 @@ let drawShape (gr : Graphics) (scale : int) (color : Color) shape =
         let minY = points |> List.map snd |> List.min
         let maxY = points |> List.map snd |> List.max
         let x, y = (minX, minY) |> scalePoint
-        let width, height = (float32(maxX - minX), float32(maxY - minY))
-        gr.DrawEllipse(pen, x, y, scaleF * (width - 0.5f), scaleF * (height - 0.5f))
-        gr.FillEllipse(brush, x, y, width * scaleF, height * scaleF)
+        let width, height = (scaleF * float32(maxX - minX), scaleF * float32(maxY - minY))
+        gr.DrawEllipse(pen, x, y, width, height)
+        gr.FillEllipse(brush, x, y, width, height)
 
 let drawFilledShape drawShape = function
     | Solid(s) -> drawShape Color.Black s
