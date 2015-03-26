@@ -3,16 +3,16 @@
 open Parser
 
 let ascii2dots (arr : string []) = 
-    let tryFindIndex arr symbol = arr |> Array.tryFindIndex (symbol |> (=))
-    let (|Solid|_|) = tryFindIndex [| 'A'..'Z' |]
-    let (|Transparent|_|) = tryFindIndex [| 'a'..'z' |]
+    let (|InRange|_|) first last = function
+        | c when c >= first && c <= last -> Some(int(c) - int(first))
+        | _ -> None
 
     [ for y in 0..arr.Length - 1 do
           let row = arr.[y].Replace(" ", "")
           for x in 0..row.Length - 1 do
               match row.[x] with
-              | Solid idx -> yield (((x, y), Solid), idx)
-              | Transparent idx -> yield (((x, y), Transparent), idx)
+              | InRange 'A' 'Z' idx -> yield (((x, y), Solid), idx)
+              | InRange 'a' 'z' idx -> yield (((x, y), Transparent), idx)
               | _ -> () ]
 
 let (|Single|_|) = function
