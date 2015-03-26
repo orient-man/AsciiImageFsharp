@@ -55,9 +55,11 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="Parser.fs" />
+    <Compile Include="ParserImplementation.fs" />
     <Compile Include="Shapes.fs" />
     <Compile Include="ParserTests.fs" />
     <Compile Include="Drawing.fs" />
+    <Compile Include="DrawingImplementation.fs" />
     <None Include="Playground.fsx" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />

@@ -4,6 +4,8 @@ open NUnit.Framework
 open Swensen.Unquote
 open Parser
 
+let parse = ParserImplementation.api
+
 [<Test>]
 let empty() = 
     let actual = Shapes.empty |> parse |> List.map snd
