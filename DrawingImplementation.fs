@@ -10,10 +10,7 @@ let drawShape (gr : Graphics) (scale : int) (color : Color) shape =
     let brush = new SolidBrush(color)
     
     let drawPixel (x, y) = gr.FillRectangle(brush, scale * x, scale * y, scale, scale)
-    
-    let scalePoint (x, y) = 
-        (scaleF * (0.5f + float32 (x)), scaleF * (0.5f + float32 (y)))
-
+    let scalePoint (x, y) = (scaleF * (0.5f + float32 (x)), scaleF * (0.5f + float32 (y)))
     let toPointF (x, y) = new PointF(x, y)
 
     match shape with
