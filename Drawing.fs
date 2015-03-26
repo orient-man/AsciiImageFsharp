@@ -37,8 +37,8 @@ let drawShape (gr : Graphics) (scale : int) (color : Color) shape =
         gr.FillEllipse(brush, x, y, width, height)
 
 let drawFilledShape drawShape = function
-    | Solid(s) -> drawShape Color.Black s
-    | Transparent(s) -> drawShape Color.White s
+    | Solid, s -> drawShape Color.Black s
+    | Transparent, s -> drawShape Color.White s
 
 let draw (scale : int) (rep : string []) = 
     let width = rep.[0].Length / 2 + 1
