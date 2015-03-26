@@ -60,4 +60,5 @@ let api : DrawingApi = fun parser scale rep ->
     rep |> parser |> List.iter (drawFilledShape (drawShape gr scale))
 
     if scale > 1 then drawGrid()
+    else bitmap.MakeTransparent Color.White
     bitmap
