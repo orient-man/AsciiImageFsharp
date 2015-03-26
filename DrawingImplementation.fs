@@ -51,9 +51,9 @@ let api : DrawingApi = fun parser scale rep ->
 
     let drawGrid() = 
         let grayPen = new Pen(Color.LightGray, 1.0f)
-        for i in 0..height do
+        for i in 1..height do
             gr.DrawLine(grayPen, new Point(0, scale * i), new Point(scaledWidth, scale * i))
-        for i in 0..width do
+        for i in 1..width do
             gr.DrawLine(grayPen, new Point(scale * i, 0), new Point(scale * i, scaledHeight))
         gr.DrawRectangle(grayPen, 0, 0, scaledWidth - 1, scaledHeight - 1)
     
