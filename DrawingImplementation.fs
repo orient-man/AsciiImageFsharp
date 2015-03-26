@@ -24,11 +24,8 @@ let drawShape (gr : Graphics) (scale : int) (color : Color) shape =
         gr.DrawLine(pen, p1 |> scalePoint |> toPointF, p2 |> scalePoint |> toPointF)
     | Pixel(p) -> drawPixel p
     | Ellipse(p1, p2, p3, p4) -> 
-        let points = [ p1; p2; p3; p4 ]
-        let minX = points |> List.map fst |> List.min
-        let maxX = points |> List.map fst |> List.max
-        let minY = points |> List.map snd |> List.min
-        let maxY = points |> List.map snd |> List.max
+        let xs, ys = [ p1; p2; p3; p4 ] |> List.unzip
+        let minX, maxX, minY, maxY = List.min xs, List.max xs, List.min ys, List.max ys
         let x, y = (minX, minY) |> scalePoint
         let width, height = (scaleF * float32(maxX - minX), scaleF * float32(maxY - minY))
         gr.DrawEllipse(pen, x, y, width, height)
