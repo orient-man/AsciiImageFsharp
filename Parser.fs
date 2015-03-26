@@ -22,28 +22,29 @@ let getOrderedDots (arr : string []) =
               | _ -> () ]
     |> List.sortBy snd
 
-let rec private parseDots acc dots = 
-    let handleOrdered points =
-        match points with
-        | [] -> []
-        | (p, opacity)::[] -> [opacity (Pixel(p))]
-        | (_, opacity)::_ -> [opacity (Polygon(points |> List.map fst |> List.rev))]
+let (|Ordered|_|) dots =
+    let rec collect acc = function
+        | (d1, i1)::(d2, i2)::tail when i2 = i1 + 1 -> collect (d1::acc) ((d2, i2)::tail)
+        | (_, i1)::(_, i2)::_ when i2 = i1 -> [], []
+        | (d, _)::tail -> (d::acc), tail
+        | [] -> acc, []
 
-    [ match dots with
-      | (d1, i1)::(d2, i2)::tail when i2 = i1 + 1 -> 
-          yield! parseDots (d1::acc) ((d2, i2)::tail)
-      | ((p1, opacity), i1)::(d2, i2)::(d3, i3)::(d4, i4)::tail
-        when i1 = i2 && i2 = i3 && i3 = i4 -> 
-          yield! handleOrdered acc
-          yield opacity (Ellipse(p1, fst d2, fst d3, fst d4))
-          yield! parseDots [] tail
-      | ((p1, opacity), i1)::(d2, i2)::tail when i1 = i2 ->
-          yield! handleOrdered acc
-          yield opacity (Line(p1, fst d2))
-          yield! parseDots [] tail
-      | (d, _)::tail ->
-          yield! handleOrdered (d::acc)
-          yield! parseDots [] tail
-      | _ -> yield! handleOrdered acc ]
+    let points, tail = collect [] dots
+    match points with
+    | (_, opacity)::_ -> Some(points |> List.map fst |> List.rev, opacity, tail)
+    | [] -> None
 
-let parse rep = rep |> getOrderedDots |> parseDots []
+let (|Shape|_|) = function
+    | Ordered(p::[], opacity, tail) -> Some(opacity (Pixel(p)), tail)
+    | Ordered(points, opacity, tail) -> Some(opacity (Polygon(points)), tail)
+    | ((p1, opacity), i1)::(d2, i2)::(d3, i3)::(d4, i4)::tail
+        when i1 = i2 && i2 = i3 && i3 = i4 ->
+        Some(opacity (Ellipse(p1, fst d2, fst d3, fst d4)), tail)
+    | ((p1, opacity), i1)::(d2, i2)::tail when i1 = i2 ->
+      Some(opacity (Line(p1, fst d2)), tail)
+    | _ -> None
+
+let rec parseDots dots = 
+    [ match dots with Shape(shape, tail) -> yield shape; yield! parseDots tail | _ -> () ]
+
+let parse rep = rep |> getOrderedDots |> parseDots
