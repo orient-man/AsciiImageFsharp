@@ -1,7 +1,15 @@
-﻿// Learn more about F# at http://fsharp.net
-// See the 'F# Tutorial' project for more help.
+﻿open System.IO
+open ParserImplementation
+open DrawingImplementation
 
 [<EntryPoint>]
-let main argv = 
-    printfn "%A" argv
-    0 // return an integer exit code
+let main = function
+    | [|inputFile|] ->
+        let asciiRep = File.ReadAllLines(inputFile)
+        let draw = DrawingImplementation.api ParserImplementation.api
+        let bitmap = draw 30 asciiRep
+        bitmap.Save(inputFile.Replace(".txt", ".png"), System.Drawing.Imaging.ImageFormat.Png)
+        0
+    | _ ->
+        printfn "Example usage: ascii2image file.txt"
+        -1;
