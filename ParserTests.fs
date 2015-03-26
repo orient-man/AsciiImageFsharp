@@ -5,17 +5,17 @@ open Swensen.Unquote
 open Parser
 
 let parse = ParserImplementation.api
+let parseAndStripOpacity rep = rep |> parse |> List.map snd
 
 [<Test>]
 let empty() = 
-    let actual = Shapes.empty |> parse |> List.map snd
+    let actual = parseAndStripOpacity Shapes.empty
     let (expected : Shape list) = []
     test <@ expected = actual @>
 
 [<Test>]
 let chevron() = 
-    let actual = Shapes.chevron |> parse |> List.map snd
-    
+    let actual = parseAndStripOpacity Shapes.chevron
     let expected = 
         [ Polygon([ (2, 1)
                     (3, 1)
@@ -31,8 +31,7 @@ let chevron() =
 
 [<Test>]
 let ``chevron + 2 shapes``() = 
-    let actual = Shapes.``chevron + 2 shapes`` |> parse |> List.map snd
-    
+    let actual = parseAndStripOpacity Shapes.``chevron + 2 shapes``
     let expected = 
         [ Polygon([ (3, 1)
                     (4, 1)
@@ -57,8 +56,7 @@ let ``chevron + 2 shapes``() =
 
 [<Test>]
 let ``8 lines``() = 
-    let actual = Shapes.``8 lines`` |> parse |> List.map snd
-    
+    let actual = parseAndStripOpacity Shapes.``8 lines``
     let expected = 
         [ Line((0, 0), (11, 0))
           Line((11, 1), (11, 10))
@@ -72,8 +70,7 @@ let ``8 lines``() =
 
 [<Test>]
 let ``lines & free shape``() = 
-    let actual = Shapes.``6 lines & free shape`` |> parse |> List.map snd
-    
+    let actual = parseAndStripOpacity Shapes.``6 lines & free shape``
     let expected = 
         [ Line((0, 0), (11, 0))
           Line((11, 1), (11, 10))
@@ -93,8 +90,7 @@ let ``lines & free shape``() =
 
 [<Test>]
 let ``ellipse + 2 pixels``() = 
-    let actual = Shapes.``ellipse + 2 pixels`` |> parse |> List.map snd
-    
+    let actual = parseAndStripOpacity Shapes.``ellipse + 2 pixels``
     let expected = 
         [ Ellipse((5, 2), (1, 6), (9, 6), (5, 10))
           Pixel(1, 1)
@@ -103,8 +99,7 @@ let ``ellipse + 2 pixels``() =
 
 [<Test>]
 let deletion() = 
-    let actual = Shapes.deletion |> parse
-    
+    let actual = parse Shapes.deletion
     let expected = 
         [ (Solid, Ellipse((5, 0), (0, 5), (10, 5), (5, 10)))
           (Transparent, Line((3, 3), (7, 7)))
