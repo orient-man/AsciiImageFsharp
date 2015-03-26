@@ -1,7 +1,5 @@
 ﻿open System
 open System.IO
-open ParserImplementation
-open DrawingImplementation
 
 let ascii2image inputFile scale =
     let asciiRep = File.ReadAllLines(inputFile)
