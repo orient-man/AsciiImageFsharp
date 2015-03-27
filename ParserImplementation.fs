@@ -42,14 +42,12 @@ let (|Sequence|_|) dots =
 
     collect [] dots
 
-let (|Shape|_|) = function
-    | Single(p, opacity, tail) -> Some((opacity, Pixel(p)), tail)
-    | Sequence(points, opacity, tail) -> Some((opacity, Polygon(points)), tail)
-    | Quad(points, opacity, tail) -> Some((opacity, Ellipse(points)), tail)
-    | Duo(points, opacity, tail)-> Some((opacity, Line(points)), tail)
-    | _ -> None
-
 let rec parse dots = 
-    [ match dots with Shape(shape, tail) -> yield shape; yield! parse tail | _ -> () ]
+    [ match dots with
+      | Single(p, op, tail) -> yield op, Pixel(p); yield! parse tail
+      | Sequence(points, op, tail) -> yield op, Polygon(points); yield! parse tail
+      | Quad(points, op, tail) -> yield op, Ellipse(points); yield! parse tail
+      | Duo(points, op, tail)-> yield op, Line(points); yield! parse tail
+      | _ -> () ]
 
 let api : ParserApi = fun rep -> rep |> ascii2dots |> List.sortBy snd |> parse
